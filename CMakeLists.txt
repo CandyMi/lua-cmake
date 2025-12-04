@@ -14,7 +14,7 @@ file(GLOB LIBLUA_SOURCES l*.c)
 list(REMOVE_ITEM LIBLUA_SOURCES ${LUA_SOURCES})
 list(REMOVE_ITEM LIBLUA_SOURCES ${LUAC_SOURCES})
 
-# 可选C++编译器
+option(USE_CXX "Force the use of the C++ compiler to build" OFF)
 if (USE_CXX)
   set_source_files_properties(${LUA_SOURCES} ${LUAC_SOURCES} ${LIBLUA_SOURCES} PROPERTIES LANGUAGE CXX)
   if (CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Clang 编译器会有警告
@@ -53,7 +53,8 @@ if (WIN32)
 endif()
 
 # 生成 Lua 可执行文件
-if (LUA_SOURCES)
+option(WITH_LUA "Generate a `lua` executable file?" ON)
+if (WITH_LUA)
   add_executable(lua ${LUA_SOURCES})
   if (NOT WIN32) # 自动检测是否存在`ReadLine`
     find_path(READLINE_INC_FOUND NAMES readline/readline.h)
@@ -68,15 +69,12 @@ if (LUA_SOURCES)
     target_link_libraries(lua PRIVATE liblua)
   endif()
   install(TARGETS lua RUNTIME DESTINATION bin)
-else()
-  message("[Warning]: Unable to generate `lua.exe`, the `lua.c` file cannot be found.")
-endif()
+endif(WITH_LUA)
 
 # 生成 Luac 可执行文件
-if(LUAC_SOURCES)
+option(WITH_LUAC "Generate a `luac` executable file?" ON)
+if (WITH_LUAC)
   add_executable(luac ${LUAC_SOURCES})
   target_link_libraries(luac PRIVATE liblua)
   install(TARGETS luac RUNTIME DESTINATION bin)
-else()
-  message("[Warning]: Unable to generate `luac.exe`, the `luac.c` file cannot be found.")
-endif()
+endif(WITH_LUAC)
