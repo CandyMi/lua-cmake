@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.8...3.12)
 
 project(lua)
 
+# 打印操作系统
+message("-- Detecting OS: '${CMAKE_SYSTEM_NAME}'")
+
 # Lua 头文件
 set(LIBLUA_INCLUDE lua.h luaconf.h lualib.h lauxlib.h lua.hpp)
 
@@ -55,11 +58,12 @@ if (LUA_SOURCES)
   if (NOT WIN32) # 自动检测是否存在`ReadLine`
     find_path(READLINE_INC_FOUND NAMES readline/readline.h)
     find_library(READLINE_LIB_FOUND NAMES readline)
+    find_library(NCURSES_LIB_FOUND NAMES ncurses)
   endif()
-  if (READLINE_INC_FOUND AND READLINE_LIB_FOUND)
+  if (READLINE_INC_FOUND AND READLINE_LIB_FOUND AND NCURSES_LIB_FOUND)
     add_definitions(-DLUA_USE_READLINE)
     include_directories( ${READLINE_INC_FOUND} )
-    target_link_libraries(lua PRIVATE liblua PRIVATE ${READLINE_LIB_FOUND})
+    target_link_libraries(lua PRIVATE liblua PRIVATE ${NCURSES_LIB_FOUND} ${READLINE_LIB_FOUND})
   else()
     target_link_libraries(lua PRIVATE liblua)
   endif()
